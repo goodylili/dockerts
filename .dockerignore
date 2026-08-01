@@ -1,0 +1,14 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+dist
+build
+*.egg-info
+.env
+
+# README.md is referenced by pyproject's `readme` field, so the build needs it
