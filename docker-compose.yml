@@ -1,0 +1,41 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dockerts:latest
+    ports:
+      - "8000:9000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8000"
+      APP_ENV: production
+      # `db` is the compose service name, resolved on the shared network.
+      DATABASE_URL: postgresql://app:app@db:5432/dockerts
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: dockerts
+    ports:
+      # Host port 5433 to avoid clashing with a local Postgres on 5432.
+      # Inside the compose network the api still talks to db:5432.
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d dockerts"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  pgdata:

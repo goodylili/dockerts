@@ -41,6 +41,19 @@ pytest
 | GET    | `/healthz`      | `{"status":"ok","version":"0.1.0","env":"..."}` |
 | GET    | `/hello/{name}` | `{"message":"Hello, {name}!"}`                  |
 
+With the app running on `localhost:8000`:
+
+```bash
+curl -s http://localhost:8000/healthz
+# {"status":"ok","version":"0.1.0","env":"development"}
+
+curl -s http://localhost:8000/hello/world
+# {"message":"Hello, world!"}
+
+# fails loudly if the service is down or unhealthy
+curl -sf http://localhost:8000/healthz > /dev/null && echo up || echo down
+```
+
 ## Environment
 
 | Var       | Default       |

@@ -12,3 +12,7 @@ build
 .env
 
 # README.md is referenced by pyproject's `readme` field, so the build needs it
+
+# local sqlite data must not leak into the image
+data
+docker-compose.yml
