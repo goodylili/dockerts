@@ -1,0 +1,65 @@
+version: 2
+
+updates:
+  # ---------------------------------------------------------------- Python --
+  - package-ecosystem: uv
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(backend)"
+    groups:
+      backend-dev:
+        dependency-type: development
+      backend-prod:
+        dependency-type: production
+
+  # ------------------------------------------------------------------ Node --
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps(frontend)"
+    groups:
+      frontend-dev:
+        dependency-type: development
+      frontend-prod:
+        dependency-type: production
+
+  # ---------------------------------------------------------------- Docker --
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(docker)"
+
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(docker)"
+
+  # Base images referenced from docker-compose.yml (postgres:16-alpine).
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(compose)"
+
+  # -------------------------------------------------------- GitHub Actions --
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps(ci)"
+    groups:
+      actions:
+        patterns:
+          - "*"
