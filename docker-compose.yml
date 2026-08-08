@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: dockerts:latest
     ports:
-      - "8000:9000"
+      - "8000:8000"
     environment:
       HOST: 0.0.0.0
       PORT: "8000"
@@ -24,9 +24,10 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: dockerts
     ports:
-      # Host port 5433 to avoid clashing with a local Postgres on 5432.
+      # Host port 5434 to avoid clashing with a local Postgres on 5432
+      # and the bayse-perps stack on 5433.
       # Inside the compose network the api still talks to db:5432.
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
