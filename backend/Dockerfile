@@ -3,7 +3,7 @@
 ########################################
 # Stage 1 — builder: resolve + install dependencies with uv
 ########################################
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 # uv binary, copied from the official distroless image (no curl/build tools needed)
 COPY --from=ghcr.io/astral-sh/uv:0.5.29 /uv /uvx /usr/local/bin/
@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ########################################
 # Stage 2 — runtime: slim, non-root, no build toolchain
 ########################################
-FROM python:3.12-slim AS runtime
+FROM python:3.13-slim AS runtime
 
 # uv is kept only as a thin launcher (`uv run ...`); it pulls in no toolchain.
 COPY --from=ghcr.io/astral-sh/uv:0.5.29 /uv /usr/local/bin/
