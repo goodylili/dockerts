@@ -6,9 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.30",
+    "uvicorn[standard]>=0.52.1",
     "sqlalchemy>=2.0",
-    "psycopg[binary]>=3.2",
+    "psycopg[binary]>=3.3.4",
     "alembic>=1.13",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
