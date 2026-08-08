@@ -3,7 +3,7 @@
 ########################################
 # Stage 1 — deps: full dependency tree (dev deps needed to build)
 ########################################
-FROM node:22-alpine AS deps
+FROM node:25-alpine AS deps
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/root/.npm \
 ########################################
 # Stage 2 — builder: compile the Next.js app
 ########################################
-FROM node:22-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -32,7 +32,7 @@ RUN npm run build
 ########################################
 # Stage 3 — prod-deps: runtime-only dependency tree
 ########################################
-FROM node:22-alpine AS prod-deps
+FROM node:25-alpine AS prod-deps
 
 WORKDIR /app
 
@@ -46,7 +46,7 @@ RUN --mount=type=cache,target=/root/.npm \
 ########################################
 # Stage 4 — runner
 ########################################
-FROM node:22-alpine AS runner
+FROM node:25-alpine AS runner
 
 WORKDIR /app
 
