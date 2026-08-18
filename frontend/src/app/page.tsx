@@ -8,7 +8,7 @@ export default function Home() {
           Biodata intake
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-balance text-slate-900 sm:text-4xl dark:text-slate-50">
-          Record a person&rsquo;s biodata
+          Getting bio data
         </h1>
         <p className="mt-3 max-w-2xl text-pretty text-slate-600 dark:text-slate-400">
           Fill in the details below. Age and BMI are calculated as you type, and
