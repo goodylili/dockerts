@@ -9,7 +9,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a main-branch run: it is the one that publishes and deploys.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 env:
   PYTHON_VERSION: "3.12"
@@ -237,3 +238,116 @@ jobs:
       - name: Tear down
         if: always()
         run: docker compose down -v --remove-orphans
+
+  publish:
+    name: publish image (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    needs: [compose-smoke]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [backend, frontend]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Lowercase the image name
+        id: name
+        run: echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.service }}
+          file: ./${{ matrix.service }}/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.name.outputs.repo }}-${{ matrix.service }}:${{ github.sha }}
+            ghcr.io/${{ steps.name.outputs.repo }}-${{ matrix.service }}:latest
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+
+  deploy:
+    name: deploy to the server
+    runs-on: ubuntu-latest
+    needs: [publish]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: read
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      SSH: ssh -i ~/.ssh/deploy_key
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up the SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: Make sure the deploy directory exists
+        run: |
+          $SSH "ubuntu@$EC2_HOST" \
+            'sudo mkdir -p /opt/dockerts && sudo chown ubuntu:ubuntu /opt/dockerts'
+
+      - name: Ship the config
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            deploy/docker-compose.prod.yml deploy/Caddyfile deploy/remote-deploy.sh \
+            "ubuntu@$EC2_HOST:/opt/dockerts/"
+
+      - name: Lowercase the image name
+        id: name
+        run: echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Pull and restart
+        run: |
+          $SSH "ubuntu@$EC2_HOST" \
+            "BACKEND_IMAGE='ghcr.io/${{ steps.name.outputs.repo }}-backend' \
+             FRONTEND_IMAGE='ghcr.io/${{ steps.name.outputs.repo }}-frontend' \
+             IMAGE_TAG='${{ github.sha }}' \
+             PUBLIC_HOST='$EC2_HOST' \
+             GHCR_USER='${{ github.actor }}' \
+             GHCR_TOKEN='${{ secrets.GITHUB_TOKEN }}' \
+             bash /opt/dockerts/remote-deploy.sh"
+
+      - name: Check the site answers
+        run: |
+          for _ in $(seq 1 45); do
+            if curl -fsS -o /dev/null "http://$EC2_HOST"; then
+              echo "site is up"; exit 0
+            fi
+            sleep 4
+          done
+          echo "site did not respond after the deploy" >&2
+          exit 1
+
+      - name: Dump logs on failure
+        if: failure()
+        run: |
+          $SSH "ubuntu@$EC2_HOST" \
+            'cd /opt/dockerts && docker compose -f docker-compose.prod.yml logs --no-color --tail=200' || true

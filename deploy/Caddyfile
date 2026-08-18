@@ -1,0 +1,17 @@
+# Everything goes to the Next.js frontend, including `/api/*` — those are the
+# frontend's own route handlers, which proxy to the backend server-side over the
+# internal network. The backend is never exposed directly.
+#
+# Served on the bare IP over HTTP. Replace `:80` with your domain
+# (e.g. `biodata.example.com`) and Caddy provisions TLS on its own — that needs
+# port 443 open and DNS pointing here.
+:80 {
+	encode gzip
+
+	reverse_proxy frontend:3000
+
+	log {
+		output stdout
+		format console
+	}
+}
