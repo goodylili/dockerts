@@ -1,12 +1,16 @@
 import { BiodataApp } from "@/components/biodata-app";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-8">
-        <p className="text-xs font-semibold tracking-[0.2em] text-indigo-600 uppercase dark:text-indigo-400">
-          Biodata intake
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <p className="text-xs font-semibold tracking-[0.2em] text-indigo-600 uppercase dark:text-indigo-400">
+            Biodata intake
+          </p>
+          <ThemeToggle />
+        </div>
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-balance text-slate-900 sm:text-4xl dark:text-slate-50">
           Getting bio data
         </h1>
