@@ -12,8 +12,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.7.1",
-    "next": "16.3.0",
+    "@hookform/resolvers": "^5.9.1",
+    "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.85.0",
