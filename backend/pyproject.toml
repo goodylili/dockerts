@@ -6,11 +6,11 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.30",
-    "sqlalchemy>=2.0",
-    "psycopg[binary]>=3.2",
-    "alembic>=1.13",
-    "pydantic>=2.7",
+    "uvicorn[standard]>=0.52.4",
+    "sqlalchemy>=2.0.52",
+    "psycopg[binary]>=3.3.5",
+    "alembic>=1.19.1",
+    "pydantic>=2.13.5",
     "pydantic-settings>=2.3",
     "email-validator>=2.1",
 ]
