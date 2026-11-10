@@ -1,0 +1,37 @@
+# Dependencies & build output (rebuilt inside the image)
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+.swc/
+
+# Test / coverage artifacts
+coverage/
+.vitest/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# VCS & CI
+.git/
+.gitignore
+.github/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Docs / local scratch
+*.md
+npm-debug.log*
+yarn-error.log*

@@ -1,18 +1,18 @@
-.git
-.gitignore
-.venv
-venv
-__pycache__
-*.pyc
-*.pyo
-.pytest_cache
-dist
-build
-*.egg-info
+# Root-level ignore. Build contexts are ./backend and ./frontend (each with its
+# own .dockerignore); this keeps any root-context build small too.
+.git/
+.github/
+**/node_modules/
+**/.next/
+**/__pycache__/
+**/.venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/coverage/
 .env
-
-# README.md is referenced by pyproject's `readme` field, so the build needs it
-
-# local sqlite data must not leak into the image
-data
-docker-compose.yml
+.env.*
+!.env.example
+**/.DS_Store
+**/*.log
+tmp/
